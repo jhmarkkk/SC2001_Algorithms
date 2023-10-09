@@ -231,18 +231,37 @@ class Graph:
 # print('%.10f' % duration)   # average around 0.000052
 
 # Completed graph with V=33
-rows, cols = (33, 33)
-graph = Graph(33)
+rows, cols = (10000, 10000)
+graph = Graph(10000)
+start_graph = time.perf_counter()
 for i in range(rows):
     for j in range(cols):
         if j <= i:
             continue
         else:
             graph.addEdge(i, j, random.randint(1,10))
+            #break
+end_graph = time.perf_counter()
+duration_graph = end_graph - start_graph
+
 start = time.perf_counter()
 graph.dijkstra(0)
 end = time.perf_counter()
 duration = end - start
-print("The value of number is : ", end="")
-print('%.10f' % duration)   # average around 0.00041
+
+print("Time taken to generate graph : ", end="")
+print('%.10f' % duration_graph)
+print("Time taken to run Dijkstra algorithm : ", end="")
+print('%.10f' % duration)
 # using heap for priority queue when number of vertices and edges are big is much faster than using array
+total = duration + duration_graph
+print("Total time taken : ", end="")
+print('%.10f' % total)
+
+# sparse graph time: 0.045 (0.025)
+# fully connected graph time: 1.4 (1.1 for graph generation)
+
+# V=10000 Fully connected
+# time to generate graph: 325seconds
+# time taken for dijkstra: 60seconds
+# total time taken: 385seconds

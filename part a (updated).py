@@ -21,19 +21,28 @@ def dijkstra(nodes, edges, source_index=0):
         for j in range(len(nodes)):
             if edges[cur[1]][j] != 0:  # loop through all adjacent vertices, j = vertex
                 if confirmed[j] != 1 and path_lengths[j] > path_lengths[cur[1]] + edges[cur[1]][j]:
+                    for i in range(len(p_q)):
+                        if p_q[i][1] == j:
+                            p_q.pop(i)
+                            break
                     path_lengths[j] = path_lengths[cur[1]] + edges[cur[1]][j]
                     parent_array[j] = cur[1]
                     if len(p_q) == 0:  # sorting with find and insert, O(logV)
                         p_q.insert(0, (path_lengths[j], j))
                     else:
+                        inserted = False
                         for i in range(len(p_q)):
                             if path_lengths[j] < p_q[i][0]:
                                 p_q.insert(i, (path_lengths[j], j))
-                        p_q.insert(len(p_q), (path_lengths[j], j))
+                                inserted = True
+                                break
+                        if inserted == False:
+                            p_q.insert(len(p_q), (path_lengths[j], j))
                     # p_q.append((path_lengths[j], j))  # update new distance value of vertex
                     # p_q.sort() #  find and insert using comparison and list.insert() function
-                    # print(p_q)
-                    # print("-------")  # can print this to show the long list of duplicates in pq
+        # print(p_q)
+        # print("-------")  # can print this to show the long list of duplicates in pq
+
     return path_lengths
 
 
@@ -111,8 +120,9 @@ def dijkstra(nodes, edges, source_index=0):
 # print("The value of number is : ", end="")
 # print('%.10f' % duration)  # average around 0.000025
 
-# Completed graph with V=50 and random edge weights
-rows, cols = (33, 33)
+# Completed graph with V=1000 and random edge weights
+rows, cols = (10000, 10000)
+start_graph = time.perf_counter()
 adj_matrix = [[0 for i in range(cols)] for j in range(rows)]
 for i in range(rows):
     for j in range(cols):
@@ -120,19 +130,33 @@ for i in range(rows):
             continue
         else:
             adj_matrix[i][j] = random.randint(1, 10)
+            #break  # to make sparse graph
 for i in range(rows):
     for j in range(cols):
         if adj_matrix[i][j] != 0:
             adj_matrix[j][i] = adj_matrix[i][j]
+end_graph = time.perf_counter()
+duration_graph = end_graph - start_graph
 vertices = [i for i in range(rows)]
-print('\n'.join(['\t'.join([str(cell) for cell in row]) for row in adj_matrix]))
+#print('\n'.join(['\t'.join([str(cell) for cell in row]) for row in adj_matrix]))
 
 start = time.perf_counter()
 my_dict = dijkstra(vertices, adj_matrix)
 pprint.PrettyPrinter(width=4).pprint(my_dict)
 end = time.perf_counter()
 duration = end - start
-print("The value of number is : ", end="")
-print('%.10f' % duration)  # averages around 33 seconds
-# possible explanation is that when using an array for the queue, the queue becomes very long, due to duplicates
-# ends up taking a lot of time for sorting
+print("Time taken to generate graph : ", end="")
+print('%.10f' % duration_graph)
+print("Time taken for Dijkstra algorithm : ", end="")
+print('%.10f' % duration)
+total = duration_graph + duration
+print("Total time taken : ", end="")
+print('%.10f' % total)
+
+# sparse graph time: 0.2 (0.13 for graph generation)
+# fully completed graph time: 0.85 (0.55 for graph generation)
+
+# for V=10000 fully connected
+# time taken to generate graph = 53seconds
+# time taken for dijkstra's algorithm: 30seconds
+# time taken total = 83seconds
